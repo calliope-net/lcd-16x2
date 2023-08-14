@@ -1,7 +1,7 @@
 
-//% color=#003F7F icon="\uf108" block="LCD 16x2" weight=18
+//% color=#003F7F icon="\uf26c" block="LCD 16x2" weight=16
 namespace lcd16x2rgb
-/* 230806
+/* 230814
 Calliope i2c Erweiterung für 'Grove - 16x2 LCD' und 'Grove - LCD RGB Backlight'
 optimiert und getestet für die gleichzeitige Nutzung mehrerer i2c Module am Calliope
 [Projekt-URL] https://github.com/calliope-net/lcd-16x2rgb
