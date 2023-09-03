@@ -5,6 +5,10 @@ Diese Seite bei [https://calliope-net.github.io/lcd-16x2rgb/](https://calliope-n
 
 * [Grove - 16x2 LCD](https://wiki.seeedstudio.com/Grove-16x2_LCD_Series/)
 
+![](https://files.seeedstudio.com/wiki/Grove-16x2_LCD_Series/img/main.jpg)
+
+![](https://files.seeedstudio.com/wiki/Grove_LCD_RGB_Backlight/images/intro.jpg)
+
 Dieses Repository kann als **Erweiterung** in MakeCode hinzugefügt werden.
 
 * öffne [makecode.calliope.cc](https://makecode.calliope.cc)
@@ -23,7 +27,12 @@ Dieses Repository kann als **Erweiterung** in MakeCode hinzugefügt werden.
 
 ### Beschreibung der Erweiterung für 'Grove - 16x2 LCD'
 
-*
+> RGB funktioniert bei allen Modulen, Text funktioniert nicht bei RGB Backlight V4.0.
+* Text Anzeige auf den Modulen ohne RGB Backlight funktioniert.
+* Text Anzeige auf RGB Backlight V5.0 funktioniert auch.
+* Text Anzeige auf RGB Backlight V4.0 funktioniert **nicht**. Andere Versionen nicht getestet.
+* RGB Backlight hat andere i2c Adresse als Text.
+* RGB Backlight hat auch bei V4.0 und V5.0 verschiedene i2c Adressen und Steuercodes.
 
 ### Erweiterungen
 
