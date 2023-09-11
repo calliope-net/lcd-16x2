@@ -1,7 +1,7 @@
 
 Diese Seite bei [https://calliope-net.github.io/lcd-16x2rgb/](https://calliope-net.github.io/lcd-16x2rgb/) öffnen.
 
-### Calliope Erweiterung für das i2c Modul:
+### Calliope Erweiterung für die i2c Module:
 
 * [Grove - 16x2 LCD](https://wiki.seeedstudio.com/Grove-16x2_LCD_Series/)
 
