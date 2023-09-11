@@ -7,6 +7,8 @@ Diese Seite bei [https://calliope-net.github.io/lcd-16x2rgb/](https://calliope-n
 
 ![](https://files.seeedstudio.com/wiki/Grove-16x2_LCD_Series/img/main.jpg)
 
+* [Grove - LCD RGB Backlight V5.0](https://wiki.seeedstudio.com/Grove-LCD_RGB_Backlight/)
+
 ![](https://files.seeedstudio.com/wiki/Grove_LCD_RGB_Backlight/images/intro.jpg)
 
 Dieses Repository kann als **Erweiterung** in MakeCode hinzugefügt werden.
