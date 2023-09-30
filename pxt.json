@@ -1,5 +1,5 @@
 {
-    "name": "lcd-16x2rgb",
+    "name": "lcd-16x2",
     "version": "1.0.2",
     "dependencies": {
         "core": "*"
@@ -14,7 +14,7 @@
         "test.ts"
     ],
     "targetVersions": {
-        "target": "4.0.35",
+        "target": "4.0.29",
         "targetId": "calliopemini"
     },
     "supportedTargets": [
