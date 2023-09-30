@@ -1,5 +1,5 @@
 
-Diese Seite bei [https://calliope-net.github.io/lcd-16x2rgb/](https://calliope-net.github.io/lcd-16x2rgb/) öffnen.
+Diese Seite bei [https://calliope-net.github.io/lcd-16x2/](https://calliope-net.github.io/lcd-16x2/) öffnen.
 
 ### Calliope Erweiterung für die i2c Module:
 
@@ -17,7 +17,7 @@ Dieses Repository kann als **Erweiterung** in MakeCode hinzugefügt werden.
 * klicke auf eine Projektvorlage
 * klicke unter dem Zahnrad-Menü auf **Erweiterungen** (oder bei den Blöcken ganz unten)
 * kopiere die folgende **Projekt-URL** in die Zwischenablage (Strg-C)
-* **calliope-net/lcd-16x2rgb**
+* **calliope-net/lcd-16x2**
 * füge sie auf der Webseite oben ein (Strg-V) und klicke auf die Lupe (oder ENTER)
 
 ![](erweiterung-laden.png)
