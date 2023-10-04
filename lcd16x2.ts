@@ -176,7 +176,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     //% group="Display"
     //% block="i2c %pADDR Display %display Cursor %cursor || Blink %blink" weight=2
     //% pADDR.shadow="lcd16x2_eADDR"
-    //% row.min=0 row.max=1 col.min=0 col.max=15 display.defl=true blink.defl=false
+    //% display.defl=true blink.defl=false
     //% display.shadow="toggleOnOff" cursor.shadow="toggleOnOff" blink.shadow="toggleOnOff"
     //% inlineInputMode=inline
     export function setDisplay(pADDR: number, display: boolean, cursor: boolean, blink?: boolean) {
