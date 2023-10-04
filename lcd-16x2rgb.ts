@@ -87,7 +87,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     // ========== group="LCD 16x2 Display"
 
     //% group="LCD 16x2 Display"
-    //% block="i2c %pADDR init LCD"  weight=86
+    //% block="i2c %pADDR init LCD"  weight=6
     export function initLCD(pADDR: eADDR_LCD) {
         control.waitMicros(30000)
         write0x80Byte(pADDR, 0x38) // Function Set DL N
@@ -99,10 +99,43 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         write0x80Byte(pADDR, 0x06) // Increment Mode
     }
 
-    export enum eAlign { left, right }
+    export enum eAlign {
+        //% block="linksbündig"
+        left,
+        //% block="rechtsbündig"
+        right
+    }
+
+    //% group="Text" advanced=true
+    //% blockId=lcd16x2rgb_text block="%s" weight=9
+    export function lcd16x2rgb_text(s: string): string { return s }
+
+    //% group="Text"
+    //% block="i2c %pADDR Text 16x2 Zeile %row von %col bis %end %pText || %pAlign" weight=5
+    //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15
+    //% pADDR.shadow="lcd16x2rgb_eADDR_LCD"
+    //% pText.shadow="lcd16x2rgb_text"
+    //% inlineInputMode=inline
+    export function writeText16x2(pADDR: number, row: number, col: number, end: number, pText: any, pAlign?: eAlign) {
+        let text: string = convertToText(pText)
+        let l: number = end - col + 1, t: string
+        if (col >= 0 && col <= 15 && l > 0 && l <= 16) {
+            setCursor(pADDR, row, col)
+
+            if (text.length >= l) t = text.substr(0, l)
+            else if (text.length < l && pAlign == eAlign.left) { t = text + "                ".substr(0, l - text.length) }
+            else if (text.length < l && pAlign == eAlign.right) { t = "                ".substr(0, l - text.length) + text }
+
+            writeLCD(pADDR, t)
+        }
+    }
+
+
+
+
 
     //% group="LCD 16x2 Display"
-    //% block="i2c %pADDR writeText row %row col %col end %end align %pFormat Text %pText" weight=84
+    //% block="i2c %pADDR writeText row %row col %col end %end align %pFormat Text %pText" weight=4
     //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15
     //% inlineInputMode=inline
     export function writeText(pADDR: eADDR_LCD, row: number, col: number, end: number, pAlign: eAlign, pText: string) {
@@ -119,7 +152,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     }
 
     //% group="LCD 16x2 Display"
-    //% block="i2c %pADDR setCursor row %row col %col" weight=82
+    //% block="i2c %pADDR setCursor row %row col %col" weight=2
     //% row.min=0 row.max=1 col.min=0 col.max=15
     export function setCursor(pADDR: eADDR_LCD, row: number, col: number) {
         write0x80Byte(pADDR, (row == 0 ? col | 0x80 : col | 0xc0))
@@ -127,7 +160,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     }
 
     //% group="LCD 16x2 Display"
-    //% block="i2c %pADDR writeText %pText" weight=80
+    //% block="i2c %pADDR writeText %pText" weight=1
     export function writeLCD(pADDR: eADDR_LCD, pText: string) {
         let b = pins.createBuffer(pText.length + 1)
         b.setUint8(0, 0x40)
@@ -204,6 +237,26 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         return pChar.charCodeAt(0) & 0xFF // es können nur 1 Byte Zeichen-Codes im Buffer übertragen werden
     }
 
+
+    // ========== group="Logik"
+
+    //% group="Logik" advanced=true
+    //% block="%i0 zwischen %i1 und %i2"
+    export function between(i0: number, i1: number, i2: number): boolean {
+        return (i0 >= i1 && i0 <= i2)
+    }
+
+    // ========== group="i2c Adressen"
+
+    //% blockId=lcd16x2rgb_eADDR_LCD
+    //% group="i2c Adressen" advanced=true
+    //% block="%pADDR" weight=4
+    export function lcd16x2rgb_eADDR(pADDR: eADDR_LCD): number { return pADDR }
+
+    //% group="i2c Adressen" advanced=true
+    //% block="Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)" weight=2
+    export function i2cError() { return lcd16x2rgb_i2cWriteBufferError }
+    let lcd16x2rgb_i2cWriteBufferError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
     // ========== PRIVATE function command nur für LCD (nicht für RGB)
 
