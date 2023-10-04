@@ -1,6 +1,6 @@
 
-//% color=#001FCF icon="\uf26c" block="LCD 16x2_" weight=18
-namespace lcd16x2rgb_
+//% color=#001FCF icon="\uf26c" block="LCD 16x2" weight=18
+namespace lcd16x2rgb
 /* 230814
 Calliope i2c Erweiterung für 'Grove - 16x2 LCD' und 'Grove - LCD RGB Backlight'
 optimiert und getestet für die gleichzeitige Nutzung mehrerer i2c Module am Calliope
@@ -29,66 +29,16 @@ initRGB ab Zeile 116; setRGB ab Zeile 298
 
 Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli 2023
 */ {
-    export enum eADDR_RGB { RGB_16x2_V5 = 0x30, RGB_16x2_x62 = 0x62 }
     export enum eADDR_LCD { LCD_16x2 = 0x3E /*, LCD_16x2_V4 = 0x70, 0x27 */ }
-
-    // Code RGB Backlight ======================================
-
-    // ========== group="RGB Backlight (nur Display mit Hintergrundfarbe)"
-
-    //% group="RGB Backlight (nur Display mit Hintergrundfarbe)"
-    //% block="i2c %i2cADDR init RGB" weight=92
-    export function initRGB(pADDR: eADDR_RGB) {
-        if (pADDR == eADDR_RGB.RGB_16x2_V5) {
-            write2Byte(pADDR, 0x00, 0x07) // reset the chip
-            control.waitMicros(200)             // wait 200 us to complete
-            write2Byte(pADDR, 0x04, 0x15) // set all led always on
-            control.waitMicros(200)
-        } else {
-            // backlight init
-            write2Byte(pADDR, 0x00, 0x00) //setReg(REG_MODE1, 0);
-            // set LEDs controllable by both PWM and GRPPWM registers
-            write2Byte(pADDR, 0x08, 0xFF) //setReg(REG_OUTPUT, 0xFF);
-            // set MODE2 values
-            // 0010 0000 -> 0x20  (DMBLNK to 1, ie blinky mode)
-            write2Byte(pADDR, 0x01, 0x20) //setReg(REG_MODE2, 0x20);
-        }
-    }
-
-    //% group="RGB Backlight (nur Display mit Hintergrundfarbe)"
-    //% block="i2c %i2cADDR set RGB r %r g %g b %b" weight=90
-    //% r.min=0 r.max=255 g.min=0 g.max=255 b.min=0 b.max=255
-    //% inlineInputMode=inline
-    export function setRGB(pADDR: eADDR_RGB, r: number, g: number, b: number) {
-        if (pADDR == eADDR_RGB.RGB_16x2_V5) {
-            write2Byte(pADDR, 6, r)
-            write2Byte(pADDR, 7, g)
-            write2Byte(pADDR, 8, b)
-        } else {
-            write2Byte(pADDR, 4, r)
-            write2Byte(pADDR, 3, g)
-            write2Byte(pADDR, 2, b)
-        }
-    }
-
-    // ========== PRIVATE function RGB
-
-    function write2Byte(pADDR: eADDR_RGB, command: number, b1: number) {
-        let b = pins.createBuffer(2)
-        b.setUint8(0, command)
-        b.setUint8(1, b1)
-        pins.i2cWriteBuffer(pADDR, b)
-    }
-
-
 
     // Code LCD 16x2 ======================================
 
     // ========== group="LCD 16x2 Display"
 
     //% group="LCD 16x2 Display"
-    //% block="i2c %pADDR init LCD"  weight=6
-    export function initLCD(pADDR: eADDR_LCD) {
+    //% block="i2c %pADDR beim Start"  weight=6
+    //% pADDR.shadow="lcd16x2rgb_eADDR_LCD"
+    export function initLCD(pADDR: number) {
         control.waitMicros(30000)
         write0x80Byte(pADDR, 0x38) // Function Set DL N
         control.waitMicros(50)
@@ -99,6 +49,9 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         write0x80Byte(pADDR, 0x06) // Increment Mode
     }
 
+
+    // ========== group="Text anzeigen"
+
     export enum eAlign {
         //% block="linksbündig"
         left,
@@ -106,35 +59,43 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         right
     }
 
-    //% group="Text" advanced=true
-    //% blockId=lcd16x2rgb_text block="%s" weight=9
-    export function lcd16x2rgb_text(s: string): string { return s }
-
-    //% group="Text"
-    //% block="i2c %pADDR Text 16x2 Zeile %row von %col bis %end %pText || %pAlign" weight=5
+    //% group="Text anzeigen"
+    //% block="i2c %pADDR Text 16x2 Zeile %row von %col bis %end %pText || %pAlign" weight=7
     //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15
     //% pADDR.shadow="lcd16x2rgb_eADDR_LCD"
     //% pText.shadow="lcd16x2rgb_text"
     //% inlineInputMode=inline
     export function writeText16x2(pADDR: number, row: number, col: number, end: number, pText: any, pAlign?: eAlign) {
         let text: string = convertToText(pText)
-        let l: number = end - col + 1, t: string
-        if (col >= 0 && col <= 15 && l > 0 && l <= 16) {
+        let len: number = end - col + 1, t: string
+        //if (col >= 0 && col <= 15 && len > 0 && len <= 16) 
+        if (between(row, 0, 1) && between(col, 0, 15) && between(len, 0, 16)) {
             setCursor(pADDR, row, col)
 
-            if (text.length >= l) t = text.substr(0, l)
-            else if (text.length < l && pAlign == eAlign.left) { t = text + "                ".substr(0, l - text.length) }
-            else if (text.length < l && pAlign == eAlign.right) { t = "                ".substr(0, l - text.length) + text }
+            if (text.length >= len) t = text.substr(0, len)
+            else if (text.length < len && pAlign == eAlign.left) { t = text + "                ".substr(0, len - text.length) }
+            else if (text.length < len && pAlign == eAlign.right) { t = "                ".substr(0, len - text.length) + text }
 
             writeLCD(pADDR, t)
+        }
+    }
+
+    //% group="Text anzeigen"
+    //% block="i2c %pADDR Cursor Zeile %row von %col" weight=6
+    //% row.min=0 row.max=1 col.min=0 col.max=15
+    //% pADDR.shadow="lcd16x2rgb_eADDR_LCD"
+    export function setCursor(pADDR: number, row: number, col: number) {
+        if (between(row, 0, 1) && between(col, 0, 15)) {
+
+            write0x80Byte(pADDR, (row == 0 ? col | 0x80 : col | 0xc0))
+            control.waitMicros(50)
         }
     }
 
 
 
 
-
-    //% group="LCD 16x2 Display"
+    //% group="LCD"
     //% block="i2c %pADDR writeText row %row col %col end %end align %pFormat Text %pText" weight=4
     //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15
     //% inlineInputMode=inline
@@ -151,15 +112,15 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         }
     }
 
-    //% group="LCD 16x2 Display"
+    //% group="LCD"
     //% block="i2c %pADDR setCursor row %row col %col" weight=2
     //% row.min=0 row.max=1 col.min=0 col.max=15
-    export function setCursor(pADDR: eADDR_LCD, row: number, col: number) {
+    export function setCursor_(pADDR: eADDR_LCD, row: number, col: number) {
         write0x80Byte(pADDR, (row == 0 ? col | 0x80 : col | 0xc0))
         control.waitMicros(50)
     }
 
-    //% group="LCD 16x2 Display"
+    //% group="LCD"
     //% block="i2c %pADDR writeText %pText" weight=1
     export function writeLCD(pADDR: eADDR_LCD, pText: string) {
         let b = pins.createBuffer(pText.length + 1)
@@ -209,6 +170,11 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
 
 
     // ========== group="Text" advanced=true
+
+    //% group="Text" advanced=true
+    //% blockId=lcd16x2rgb_text block="%s" weight=9
+    export function lcd16x2rgb_text(s: string): string { return s }
+
 
     //% group="Text" advanced=true
     //% block="Sonderzeichen Code von Char %pChar" weight=40
@@ -266,4 +232,5 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         b.setUint8(1, b1)
         pins.i2cWriteBuffer(pADDR, b)
     }
-} // lcd-16x2rgb.ts
+} // lcd16x2.ts
+
