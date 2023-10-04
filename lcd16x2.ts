@@ -198,14 +198,14 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         }
      */
 
-    // ========== group="Text" advanced=true
+    // ========== group="Text, Logik" advanced=true
 
-    //% group="Text" advanced=true
+    //% group="Text, Logik" advanced=true
     //% blockId=lcd16x2_text block="%s" weight=6
     export function lcd16x2_text(s: string): string { return s }
 
 
-    //% group="Text" advanced=true
+    //% group="Text, Logik" advanced=true
     //% block="Sonderzeichen Code von Char %pChar" weight=4
     export function changeCharCode(pChar: string) {
         if (pChar.length == 0) return 0
@@ -235,8 +235,8 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
 
     // ========== group="Logik"
 
-    //% group="Logik" advanced=true
-    //% block="%i0 zwischen %i1 und %i2"
+    //% group="Text, Logik" advanced=true
+    //% block="%i0 zwischen %i1 und %i2" weight=2
     export function between(i0: number, i1: number, i2: number): boolean {
         return (i0 >= i1 && i0 <= i2)
     }
