@@ -10,8 +10,9 @@ namespace lcd16x2rgb
     // ========== group="RGB Backlight (nur Display mit Hintergrundfarbe)"
 
     //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
-    //% block="i2c %i2cADDR init RGB" weight=2
-    export function initRGB(pADDR: eADDR_RGB) {
+    //% block="i2c %pADDR beim Start" weight=2
+    //% pADDR.shadow="lcd16x2rgb_eADDR"
+    export function initRGB(pADDR: number) {
         if (pADDR == eADDR_RGB.RGB_16x2_V5) {
             write2Byte(pADDR, 0x00, 0x07) // reset the chip
             control.waitMicros(200)             // wait 200 us to complete
@@ -29,10 +30,11 @@ namespace lcd16x2rgb
     }
 
     //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
-    //% block="i2c %i2cADDR set RGB r %r g %g b %b" weight=1
+    //% block="i2c %pADDR set RGB r %r g %g b %b" weight=1
+    //% pADDR.shadow="lcd16x2rgb_eADDR"
     //% r.min=0 r.max=255 g.min=0 g.max=255 b.min=0 b.max=255
     //% inlineInputMode=inline
-    export function setRGB(pADDR: eADDR_RGB, r: number, g: number, b: number) {
+    export function setRGB(pADDR: number, r: number, g: number, b: number) {
         if (pADDR == eADDR_RGB.RGB_16x2_V5) {
             write2Byte(pADDR, 6, r)
             write2Byte(pADDR, 7, g)
@@ -50,8 +52,20 @@ namespace lcd16x2rgb
         let b = pins.createBuffer(2)
         b.setUint8(0, command)
         b.setUint8(1, b1)
-        pins.i2cWriteBuffer(pADDR, b)
+        lcd16x2rgb_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
     }
 
+
+    // ========== group="i2c Adressen"
+
+    //% blockId=lcd16x2rgb_eADDR
+    //% group="i2c Adressen" subcategory="RGB Backlight"
+    //% block="%pADDR" weight=4
+    export function lcd16x2rgb_eADDR(pADDR: eADDR_RGB): number { return pADDR }
+
+    //% group="i2c Adressen" subcategory="RGB Backlight"
+    //% block="Fehlercode vom letzten WriteBuffer [RGB] (0 ist kein Fehler)" weight=2
+    export function i2cError_RGB() { return lcd16x2rgb_i2cWriteBufferError }
+    let lcd16x2rgb_i2cWriteBufferError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
 } // lcd16x2rgb.ts
