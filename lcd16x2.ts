@@ -69,7 +69,8 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
 
     //% group="Text anzeigen"
     //% block="i2c %pADDR Text Zeile %row von %col bis %end %pText || %pAlign" weight=7
-    //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15
+    //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15 
+    //% pAlign.defl=0
     //% pADDR.shadow="lcd16x2_eADDR"
     //% pText.shadow="lcd16x2_text"
     //% inlineInputMode=inline
