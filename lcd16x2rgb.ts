@@ -10,7 +10,7 @@ namespace lcd16x2rgb
     // ========== group="RGB Backlight (nur Display mit Hintergrundfarbe)"
 
     //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
-    //% block="i2c %pADDR beim Start" weight=2
+    //% block="i2c %pADDR beim Start" weight=3
     //% pADDR.shadow="lcd16x2rgb_eADDR"
     export function initRGB(pADDR: number) {
         if (pADDR == eADDR_RGB.RGB_16x2_V5) {
@@ -30,7 +30,7 @@ namespace lcd16x2rgb
     }
 
     //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
-    //% block="i2c %pADDR set RGB r %r g %g b %b" weight=1
+    //% block="i2c %pADDR set RGB rot %r grün %g blau %b" weight=2
     //% pADDR.shadow="lcd16x2rgb_eADDR"
     //% r.min=0 r.max=255 g.min=0 g.max=255 b.min=0 b.max=255
     //% inlineInputMode=inline
@@ -45,6 +45,15 @@ namespace lcd16x2rgb
             write2Byte(pADDR, 2, b)
         }
     }
+
+    //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
+    //% block="i2c %pADDR set RGB %color" weight=1
+    //% pADDR.shadow="lcd16x2rgb_eADDR"
+    //% color.shadow="colorNumberPicker"
+    export function setRGB1(pADDR: number, color: number) {
+        setRGB(pADDR, color >>> 16 & 0xFF, color >>> 8 & 0xFF, color & 0xFF)
+    }
+
 
     // ========== PRIVATE function RGB
 
