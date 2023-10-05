@@ -41,9 +41,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     export function initLCD(pADDR: number) {
         control.waitMicros(30000)
         write0x80Byte(pADDR, 0x38) // Function Set DL N
-        if (lcd16x2_i2cWriteBufferError != 0) {
-            basic.showNumber(pADDR)
-        } else {
+        if (i2cNoError(pADDR)) {
             control.waitMicros(50)
             write0x80Byte(pADDR, 0x0C) // Display ON, Cursor OFF
             control.waitMicros(50)
@@ -51,6 +49,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
             control.waitMicros(1600)
             write0x80Byte(pADDR, 0x06) // Increment Mode
         }
+        control.waitMicros(30000)
     }
 
     //% group="LCD 16x2 Display"
@@ -215,8 +214,17 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     //% group="i2c Adressen" advanced=true
     //% block="Fehlercode vom letzten WriteBuffer [LCD] (0 ist kein Fehler)" weight=2
     export function i2cError_LCD() { return lcd16x2_i2cWriteBufferError }
+
     let lcd16x2_i2cWriteBufferError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
+    function i2cNoError(pADDR: number): boolean {
+        if (i2cError_LCD() == 0) {
+            return true
+        } else {
+            basic.showNumber(pADDR) // wenn Modul nicht angesteckt: i2c Adresse anzeigen und Abbruch
+            return false
+        }
+    }
     // ========== PRIVATE function command nur für LCD (nicht für RGB)
 
     function write0x80Byte(pADDR: number, b1: number) {

@@ -15,9 +15,7 @@ namespace lcd16x2rgb
     export function initRGB(pADDR: number) {
         if (pADDR == eADDR_RGB.RGB_16x2_V5) {
             write2Byte(pADDR, 0x00, 0x07) // reset the chip
-            if (lcd16x2rgb_i2cWriteBufferError != 0) {
-                basic.showNumber(pADDR)
-            } else {
+            if (i2cNoError(pADDR)) {
                 control.waitMicros(200)             // wait 200 us to complete
                 write2Byte(pADDR, 0x04, 0x15) // set all led always on
                 control.waitMicros(200)
@@ -84,6 +82,15 @@ namespace lcd16x2rgb
     //% group="i2c Adressen" subcategory="RGB Backlight"
     //% block="Fehlercode vom letzten WriteBuffer [RGB] (0 ist kein Fehler)" weight=2
     export function i2cError_RGB() { return lcd16x2rgb_i2cWriteBufferError }
+
     let lcd16x2rgb_i2cWriteBufferError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
+    function i2cNoError(pADDR: number): boolean {
+        if (i2cError_RGB() == 0) {
+            return true
+        } else {
+            basic.showNumber(pADDR) // wenn Modul nicht angesteckt: i2c Adresse anzeigen und Abbruch
+            return false
+        }
+    }
 } // lcd16x2rgb.ts
