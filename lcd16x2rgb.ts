@@ -15,17 +15,25 @@ namespace lcd16x2rgb
     export function initRGB(pADDR: number) {
         if (pADDR == eADDR_RGB.RGB_16x2_V5) {
             write2Byte(pADDR, 0x00, 0x07) // reset the chip
-            control.waitMicros(200)             // wait 200 us to complete
-            write2Byte(pADDR, 0x04, 0x15) // set all led always on
-            control.waitMicros(200)
+            if (lcd16x2rgb_i2cWriteBufferError != 0) {
+                basic.showNumber(pADDR)
+            } else {
+                control.waitMicros(200)             // wait 200 us to complete
+                write2Byte(pADDR, 0x04, 0x15) // set all led always on
+                control.waitMicros(200)
+            }
         } else {
             // backlight init
             write2Byte(pADDR, 0x00, 0x00) //setReg(REG_MODE1, 0);
-            // set LEDs controllable by both PWM and GRPPWM registers
-            write2Byte(pADDR, 0x08, 0xFF) //setReg(REG_OUTPUT, 0xFF);
-            // set MODE2 values
-            // 0010 0000 -> 0x20  (DMBLNK to 1, ie blinky mode)
-            write2Byte(pADDR, 0x01, 0x20) //setReg(REG_MODE2, 0x20);
+            if (lcd16x2rgb_i2cWriteBufferError != 0) {
+                basic.showNumber(pADDR)
+            } else {
+                // set LEDs controllable by both PWM and GRPPWM registers
+                write2Byte(pADDR, 0x08, 0xFF) //setReg(REG_OUTPUT, 0xFF);
+                // set MODE2 values
+                // 0010 0000 -> 0x20  (DMBLNK to 1, ie blinky mode)
+                write2Byte(pADDR, 0x01, 0x20) //setReg(REG_MODE2, 0x20);
+            }
         }
     }
 
@@ -62,6 +70,7 @@ namespace lcd16x2rgb
         b.setUint8(0, command)
         b.setUint8(1, b1)
         lcd16x2rgb_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
+        //return lcd16x2rgb_i2cWriteBufferError
     }
 
 

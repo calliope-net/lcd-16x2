@@ -41,12 +41,16 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     export function initLCD(pADDR: number) {
         control.waitMicros(30000)
         write0x80Byte(pADDR, 0x38) // Function Set DL N
-        control.waitMicros(50)
-        write0x80Byte(pADDR, 0x0C) // Display ON, Cursor OFF
-        control.waitMicros(50)
-        write0x80Byte(pADDR, 0x01) // Screen Clear
-        control.waitMicros(1600)
-        write0x80Byte(pADDR, 0x06) // Increment Mode
+        if (lcd16x2_i2cWriteBufferError != 0) {
+            basic.showNumber(pADDR)
+        } else {
+            control.waitMicros(50)
+            write0x80Byte(pADDR, 0x0C) // Display ON, Cursor OFF
+            control.waitMicros(50)
+            write0x80Byte(pADDR, 0x01) // Screen Clear
+            control.waitMicros(1600)
+            write0x80Byte(pADDR, 0x06) // Increment Mode
+        }
     }
 
     //% group="LCD 16x2 Display"
