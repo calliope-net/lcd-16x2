@@ -32,7 +32,7 @@ namespace lcd16x2rgb
     //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
     //% block="i2c %pADDR set RGB rot %r grün %g blau %b" weight=2
     //% pADDR.shadow="lcd16x2rgb_eADDR"
-    //% r.min=0 r.max=255 g.min=0 g.max=255 b.min=0 b.max=255
+    //% r.min=0 r.max=255 r.defl=255 g.min=0 g.max=255 g.defl=255 b.min=0 b.max=255 b.defl=255
     //% inlineInputMode=inline
     export function setRGB(pADDR: number, r: number, g: number, b: number) {
         if (pADDR == eADDR_RGB.RGB_16x2_V5) {

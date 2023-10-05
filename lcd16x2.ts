@@ -69,30 +69,34 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
 
     //% group="Text anzeigen"
     //% block="i2c %pADDR Text Zeile %row von %col bis %end %pText || %pAlign" weight=7
-    //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15 
-    //% pAlign.defl=0
     //% pADDR.shadow="lcd16x2_eADDR"
+    //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15
     //% pText.shadow="lcd16x2_text"
+    //% pAlign.defl=0
     //% inlineInputMode=inline
     export function writeText(pADDR: number, row: number, col: number, end: number, pText: any, pAlign?: eAlign) {
         let text: string = convertToText(pText)
-        let len: number = end - col + 1, t: string
+        let len: number = end - col + 1
         //if (col >= 0 && col <= 15 && len > 0 && len <= 16) 
         if (between(row, 0, 1) && between(col, 0, 15) && between(len, 0, 16)) {
             setCursor(pADDR, row, col)
 
-            if (text.length >= len) t = text.substr(0, len)
-            else if (text.length < len && pAlign == eAlign.left) { t = text + "                ".substr(0, len - text.length) }
-            else if (text.length < len && pAlign == eAlign.right) { t = "                ".substr(0, len - text.length) + text }
+            if (text.length > len)
+                text = text.substr(0, len)
+            else if (text.length < len && pAlign == eAlign.right)
+                text = "                ".substr(0, len - text.length) + text
+            else if (text.length < len)
+                text = text + "                ".substr(0, len - text.length)
+            // else { } // Original Text text.length == len
 
-            writeLCD(pADDR, t)
+            writeLCD(pADDR, text)
         }
     }
 
     //% group="Text anzeigen"
     //% block="i2c %pADDR Cursor Zeile %row von %col" weight=6
-    //% row.min=0 row.max=1 col.min=0 col.max=15
     //% pADDR.shadow="lcd16x2_eADDR"
+    //% row.min=0 row.max=1 col.min=0 col.max=15
     export function setCursor(pADDR: number, row: number, col: number) {
         if (between(row, 0, 1) && between(col, 0, 15)) {
 
@@ -117,51 +121,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     }
 
 
-    // ========== group="LCD"
-
-    /* 
-        //% group="LCD"
-        //% block="i2c %pADDR writeText row %row col %col end %end align %pFormat Text %pText" weight=4
-        //% row.min=0 row.max=1 col.min=0 col.max=15 end.min=0 end.max=15 end.defl=15
-        //% inlineInputMode=inline
-        function writeText_(pADDR: eADDR_LCD, row: number, col: number, end: number, pAlign: eAlign, pText: string) {
-            let l: number = end - col + 1, t: string
-            if (col >= 0 && col <= 15 && l > 0 && l <= 16) {
-                setCursor(pADDR, row, col)
-    
-                if (pText.length >= l) t = pText.substr(0, l)
-                else if (pText.length < l && pAlign == eAlign.left) { t = pText + "                ".substr(0, l - pText.length) }
-                else if (pText.length < l && pAlign == eAlign.right) { t = "                ".substr(0, l - pText.length) + pText }
-    
-                writeLCD(pADDR, t)
-            }
-        }
-    
-        //% group="LCD"
-        //% block="i2c %pADDR setCursor row %row col %col" weight=2
-        //% row.min=0 row.max=1 col.min=0 col.max=15
-        function setCursor_(pADDR: eADDR_LCD, row: number, col: number) {
-            write0x80Byte(pADDR, (row == 0 ? col | 0x80 : col | 0xc0))
-            control.waitMicros(50)
-        }
-    
-        //% group="LCD"
-        //% block="i2c %pADDR writeText %pText" weight=1
-        function writeLCD_(pADDR: eADDR_LCD, pText: string) {
-            let b = pins.createBuffer(pText.length + 1)
-            b.setUint8(0, 0x40)
-            for (let Index = 0; Index <= pText.length - 1; Index++) {
-                b.setUint8(Index + 1, changeCharCode(pText.charAt(Index)))
-                //b.setUint8(Index + 1, umlaut(pText.charCodeAt(Index)))
-            }
-            lcd16x2_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
-            control.waitMicros(50)
-        }
-     */
-
     // ========== group="Display"
-
-    //export enum eONOFF { OFF = 0, ON = 1 }
 
     //% group="Display"
     //% block="i2c %pADDR Cursor Zeile %row von %col Cursor %cursor || Blink %blink" weight=4
@@ -229,7 +189,6 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
             case "µ": return 0xE4
             case "°": return 0xDF
         }
-        //if ("gjpqy".indexOf(pChar) > -1) return pChar.charCodeAt(0) | 0x80 // funktioniert, Zeichen unten abgeschnitten
         return pChar.charCodeAt(0) & 0xFF // es können nur 1 Byte Zeichen-Codes im Buffer übertragen werden
     }
 
