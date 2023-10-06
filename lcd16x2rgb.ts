@@ -89,7 +89,8 @@ namespace lcd16x2rgb
         if (i2cError_RGB() == 0) {
             return true
         } else {
-            basic.showNumber(pADDR) // wenn Modul nicht angesteckt: i2c Adresse anzeigen und Abbruch
+            basic.showString(Buffer.fromArray([pADDR]).toHex())
+            //basic.showNumber(pADDR) // wenn Modul nicht angesteckt: i2c Adresse anzeigen und Abbruch
             return false
         }
     }

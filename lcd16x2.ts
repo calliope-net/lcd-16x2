@@ -221,7 +221,8 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         if (i2cError_LCD() == 0) {
             return true
         } else {
-            basic.showNumber(pADDR) // wenn Modul nicht angesteckt: i2c Adresse anzeigen und Abbruch
+            basic.showString(Buffer.fromArray([pADDR]).toHex())
+            //basic.showNumber(pADDR) // wenn Modul nicht angesteckt: i2c Adresse anzeigen und Abbruch
             return false
         }
     }
