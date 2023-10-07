@@ -30,26 +30,33 @@ initRGB ab Zeile 116; setRGB ab Zeile 298
 Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli 2023
 */ {
     export enum eADDR_LCD { LCD_16x2 = 0x3E /*, LCD_16x2_V4 = 0x70, 0x27 */ }
+    let n_ck: boolean = false // i2c-Check
+    let n_i2cWriteBufferError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
     // Code LCD 16x2 ======================================
 
     // ========== group="LCD 16x2 Display"
 
     //% group="LCD 16x2 Display"
-    //% block="i2c %pADDR beim Start" weight=6
+    //% block="i2c %pADDR beim Start || i2c-check %ck" weight=6
     //% pADDR.shadow="lcd16x2_eADDR"
-    export function initLCD(pADDR: number) {
-        control.waitMicros(30000)
+    //% ck.shadow="toggleOnOff" ck.defl=true
+    export function initLCD(pADDR: number, ck?: boolean) { // ck.defl=0 ist false
+        if (ck) n_ck = true; else n_ck = false // optionaler boolean Parameter kann undefined sein
+        n_i2cWriteBufferError = 0 // Reset Fehlercode
+
+        control.waitMicros(30000) // Power on + more than 15ms
         write0x80Byte(pADDR, 0x38) // Function Set DL N
+        control.waitMicros(50) // >39µs
         if (i2cNoError(pADDR)) {
-            control.waitMicros(50)
             write0x80Byte(pADDR, 0x0C) // Display ON, Cursor OFF
-            control.waitMicros(50)
+            control.waitMicros(50) // >39µs
             write0x80Byte(pADDR, 0x01) // Screen Clear
-            control.waitMicros(1600)
+            control.waitMicros(1600) // > 1.53ms
             write0x80Byte(pADDR, 0x06) // Increment Mode
+            control.waitMicros(50) // >39µs
         }
-        control.waitMicros(30000)
+        //control.waitMicros(30000)
     }
 
     //% group="LCD 16x2 Display"
@@ -119,7 +126,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         for (let i = 0; i <= text.length - 1; i++) {
             b.setUint8(i + 1, changeCharCode(text.charAt(i)))
         }
-        lcd16x2_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
+        n_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
         control.waitMicros(50)
     }
 
@@ -213,9 +220,8 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
 
     //% group="i2c Adressen" advanced=true
     //% block="Fehlercode vom letzten WriteBuffer [LCD] (0 ist kein Fehler)" weight=2
-    export function i2cError_LCD() { return lcd16x2_i2cWriteBufferError }
+    export function i2cError_LCD() { return n_i2cWriteBufferError }
 
-    let lcd16x2_i2cWriteBufferError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
     function i2cNoError(pADDR: number): boolean {
         if (i2cError_LCD() == 0) {
@@ -226,13 +232,19 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
             return false
         }
     }
+
+    function i2cWriteBuffer(pADDR: number, buf: Buffer, repeat?: boolean) {
+        if (pins.i2cWriteBuffer(pADDR, buf, repeat) != 0) {
+
+        }
+    }
+
     // ========== PRIVATE function command nur für LCD (nicht für RGB)
 
     function write0x80Byte(pADDR: number, b1: number) {
         let b = pins.createBuffer(2)
         b.setUint8(0, 0x80)
         b.setUint8(1, b1)
-        lcd16x2_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
+        n_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
     }
 } // lcd16x2.ts
-
