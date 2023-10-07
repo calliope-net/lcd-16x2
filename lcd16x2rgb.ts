@@ -3,6 +3,8 @@ namespace lcd16x2rgb
 /*
 */ {
     export enum eADDR_RGB { RGB_16x2_V5 = 0x30, RGB_16x2_x62 = 0x62 }
+    let n_i2cCheck: boolean = false // i2c-Check
+    let n_i2cError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
 
     // Code RGB Backlight ======================================
@@ -12,26 +14,30 @@ namespace lcd16x2rgb
     //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
     //% block="i2c %pADDR beim Start" weight=3
     //% pADDR.shadow="lcd16x2rgb_eADDR"
-    export function initRGB(pADDR: number) {
+    //% ck.shadow="toggleOnOff" ck.defl=1
+    export function initRGB(pADDR: number, ck?: boolean) {
+        if (ck) n_i2cCheck = true; else n_i2cCheck = false // optionaler boolean Parameter kann undefined sein
+        n_i2cError = 0 // Reset Fehlercode
+
         if (pADDR == eADDR_RGB.RGB_16x2_V5) {
             write2Byte(pADDR, 0x00, 0x07) // reset the chip
-            if (i2cNoError(pADDR)) {
-                control.waitMicros(200)             // wait 200 us to complete
-                write2Byte(pADDR, 0x04, 0x15) // set all led always on
-                control.waitMicros(200)
-            }
+            //if (i2cNoError(pADDR)) {
+            control.waitMicros(200)             // wait 200 us to complete
+            write2Byte(pADDR, 0x04, 0x15) // set all led always on
+            control.waitMicros(200)
+            //}
         } else {
             // backlight init
             write2Byte(pADDR, 0x00, 0x00) //setReg(REG_MODE1, 0);
-            if (lcd16x2rgb_i2cWriteBufferError != 0) {
-                basic.showNumber(pADDR)
-            } else {
-                // set LEDs controllable by both PWM and GRPPWM registers
-                write2Byte(pADDR, 0x08, 0xFF) //setReg(REG_OUTPUT, 0xFF);
-                // set MODE2 values
-                // 0010 0000 -> 0x20  (DMBLNK to 1, ie blinky mode)
-                write2Byte(pADDR, 0x01, 0x20) //setReg(REG_MODE2, 0x20);
-            }
+            //if (n_i2cError != 0) {
+            //    basic.showNumber(pADDR)
+            //} else {
+            // set LEDs controllable by both PWM and GRPPWM registers
+            write2Byte(pADDR, 0x08, 0xFF) //setReg(REG_OUTPUT, 0xFF);
+            // set MODE2 values
+            // 0010 0000 -> 0x20  (DMBLNK to 1, ie blinky mode)
+            write2Byte(pADDR, 0x01, 0x20) //setReg(REG_MODE2, 0x20);
+            //}
         }
     }
 
@@ -64,13 +70,11 @@ namespace lcd16x2rgb
     // ========== PRIVATE function RGB
 
     function write2Byte(pADDR: eADDR_RGB, command: number, b1: number) {
-        let b = pins.createBuffer(2)
+        let b = Buffer.create(2)
         b.setUint8(0, command)
         b.setUint8(1, b1)
-        lcd16x2rgb_i2cWriteBufferError = pins.i2cWriteBuffer(pADDR, b)
-        //return lcd16x2rgb_i2cWriteBufferError
+        i2cWriteBuffer(pADDR, b)
     }
-
 
     // ========== group="i2c Adressen"
 
@@ -80,12 +84,21 @@ namespace lcd16x2rgb
     export function lcd16x2rgb_eADDR(pADDR: eADDR_RGB): number { return pADDR }
 
     //% group="i2c Adressen" subcategory="RGB Backlight"
-    //% block="Fehlercode vom letzten WriteBuffer [RGB] (0 ist kein Fehler)" weight=2
-    export function i2cError_RGB() { return lcd16x2rgb_i2cWriteBufferError }
+    //% block="i2c Fehlercode RGB" weight=2
+    export function i2cError_RGB() { return n_i2cError }
 
-    let lcd16x2rgb_i2cWriteBufferError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
+    function i2cWriteBuffer(pADDR: number, buf: Buffer, repeat?: boolean) {
+        if (n_i2cError == 0) { // vorher kein Fehler
+            n_i2cError = pins.i2cWriteBuffer(pADDR, buf, repeat)
+            if (n_i2cCheck && n_i2cError != 0)  // vorher kein Fehler, wenn (n_i2cCheck=true): beim 1. Fehler anzeigen
+                basic.showString(Buffer.fromArray([pADDR]).toHex()) // zeige fehlerhafte i2c-Adresse als HEX
+        } else if (!n_i2cCheck)  // vorher Fehler, aber ignorieren, i2c weiter versuchen (n_i2cCheck=false)
+            n_i2cError = pins.i2cWriteBuffer(pADDR, buf, repeat)
+    }
 
-    function i2cNoError(pADDR: number): boolean {
+    //let n_i2cError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
+
+    /* function i2cNoError(pADDR: number): boolean {
         if (i2cError_RGB() == 0) {
             return true
         } else {
@@ -93,5 +106,5 @@ namespace lcd16x2rgb
             //basic.showNumber(pADDR) // wenn Modul nicht angesteckt: i2c Adresse anzeigen und Abbruch
             return false
         }
-    }
+    } */
 } // lcd16x2rgb.ts
