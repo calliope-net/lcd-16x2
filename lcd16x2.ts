@@ -42,7 +42,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     //% pADDR.shadow="lcd16x2_eADDR"
     //% ck.shadow="toggleOnOff" ck.defl=1
     export function initLCD(pADDR: number, ck?: boolean) { // ck.defl=0 ist false
-        if (ck) n_i2cCheck = true; else n_i2cCheck = false // optionaler boolean Parameter kann undefined sein
+        n_i2cCheck = (ck ? true : false) // optionaler boolean Parameter kann undefined sein
         n_i2cError = 0 // Reset Fehlercode
 
         control.waitMicros(30000) // Power on + more than 15ms
@@ -222,33 +222,23 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     //% block="i2c Fehlercode LCD" weight=2
     export function i2cError_LCD() { return n_i2cError }
 
-    function i2cWriteBuffer(pADDR: number, buf: Buffer, repeat?: boolean) {
+    function i2cWriteBuffer(pADDR: number, buf: Buffer, repeat: boolean = false) {
         if (n_i2cError == 0) { // vorher kein Fehler
             n_i2cError = pins.i2cWriteBuffer(pADDR, buf, repeat)
-
-            //if (n_i2cError == null) { basic.setLedColor(0xff0000)}
-            //basic.setLedColor(0xff0000)
-            if (n_i2cCheck && n_i2cError != 0)  // vorher kein Fehler, wenn (n_ck=true): beim 1. Fehler anzeigen
+            if (n_i2cCheck && n_i2cError != 0)  // vorher kein Fehler, wenn (n_i2cCheck=true): beim 1. Fehler anzeigen
                 basic.showString(Buffer.fromArray([pADDR]).toHex()) // zeige fehlerhafte i2c-Adresse als HEX
-
-        } else if (!n_i2cCheck)  // vorher Fehler, aber ignorieren, i2c weiter versuchen (n_ck=false)
+        } else if (!n_i2cCheck)  // vorher Fehler, aber ignorieren (n_i2cCheck=false): i2c weiter versuchen
             n_i2cError = pins.i2cWriteBuffer(pADDR, buf, repeat)
-        /* 
-        if (!n_i2cCheck || n_i2cError == 0) {
-            n_i2cError = pins.i2cWriteBuffer(pADDR, buf, repeat)
-
-            if (n_i2cCheck && n_i2cError != 0)
-                basic.showString(Buffer.fromArray([pADDR]).toHex()) // zeige fehlerhafte i2c-Adresse als HEX
-        } */
+        //else { } // n_i2cCheck=true und n_i2cError != 0: weitere i2c Aufrufe blockieren
     }
 
-    //% block="i2c %pADDR i2cReadBuffer %size || %repeat" weight=1
-    export function i2cReadBuffer(pADDR: number, size: number, repeat?: boolean) {
-        //if (!n_i2cCheck || n_i2cError == 0)
-        return pins.i2cReadBuffer(pADDR, size, repeat).getUint8(0)
-        //else
-        //    return Buffer.create(size)
-    }
+    /* // wird beim LCD-Display nicht gebraucht
+    function i2cReadBuffer(pADDR: number, size: number, repeat: boolean = false): Buffer {
+        if (!n_i2cCheck || n_i2cError == 0)
+            return pins.i2cReadBuffer(pADDR, size, repeat)
+        else
+            return Buffer.create(size)
+    } */
 
     // ========== PRIVATE function command nur für LCD (nicht für RGB)
 
