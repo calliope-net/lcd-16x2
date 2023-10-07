@@ -12,7 +12,7 @@ namespace lcd16x2rgb
     // ========== group="RGB Backlight (nur Display mit Hintergrundfarbe)"
 
     //% group="RGB Backlight (nur Display mit Hintergrundfarbe)" subcategory="RGB Backlight"
-    //% block="i2c %pADDR beim Start" weight=3
+    //% block="i2c %pADDR beim Start || i2c-Check %ck" weight=3
     //% pADDR.shadow="lcd16x2rgb_eADDR"
     //% ck.shadow="toggleOnOff" ck.defl=1
     export function initRGB(pADDR: number, ck?: boolean) {

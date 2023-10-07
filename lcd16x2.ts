@@ -38,7 +38,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
     // ========== group="LCD 16x2 Display"
 
     //% group="LCD 16x2 Display"
-    //% block="i2c %pADDR beim Start || i2c-check %ck" weight=6
+    //% block="i2c %pADDR beim Start || i2c-Check %ck" weight=6
     //% pADDR.shadow="lcd16x2_eADDR"
     //% ck.shadow="toggleOnOff" ck.defl=1
     export function initLCD(pADDR: number, ck?: boolean) { // ck.defl=0 ist false
