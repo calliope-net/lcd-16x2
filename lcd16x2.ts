@@ -1,11 +1,11 @@
 
 //% color=#001FCF icon="\uf26c" block="LCD 16x2" weight=18
 namespace lcd16x2rgb
-/* 230814 231007
+/* 230814 231007 https://github.com/calliope-net/lcd-16x2
 Calliope i2c Erweiterung für 'Grove - 16x2 LCD' und 'Grove - LCD RGB Backlight'
 optimiert und getestet für die gleichzeitige Nutzung mehrerer i2c Module am Calliope
-[Projekt-URL] https://github.com/calliope-net/lcd-16x2rgb
-[README]      https://calliope-net.github.io/lcd-16x2rgb
+[Projekt-URL] https://github.com/calliope-net/lcd-16x2
+[README]      https://calliope-net.github.io/lcd-16x2
 
 [Hardware] https://wiki.seeedstudio.com/Grove-16x2_LCD_Series
 [PDF] JDH_1804_Datasheet https://files.seeedstudio.com/wiki/Grove-16x2_LCD_Series/res/JDH_1804_Datasheet.pdf
@@ -29,15 +29,15 @@ initRGB ab Zeile 116; setRGB ab Zeile 298
 
 Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli 2023
 */ {
-    export enum eADDR_LCD { LCD_16x2 = 0x3E /*, LCD_16x2_V4 = 0x70, 0x27 */ }
+    export enum eADDR_LCD { LCD_16x2_x3E = 0x3E, LCD_16x2 = 0x3E /*, LCD_16x2_V4 = 0x70, 0x27 */ }
     let n_i2cCheck: boolean = false // i2c-Check
     let n_i2cError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
     // Code LCD 16x2 ======================================
 
-    // ========== group="LCD 16x2 Display"
+    // ========== group="calliope-net.github.io/lcd-16x2"
 
-    //% group="LCD 16x2 Display"
+    //% group="calliope-net.github.io/lcd-16x2"
     //% block="i2c %pADDR beim Start || i2c-Check %ck" weight=6
     //% pADDR.shadow="lcd16x2_eADDR"
     //% ck.shadow="toggleOnOff" ck.defl=1
@@ -59,7 +59,7 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         //control.waitMicros(30000)
     }
 
-    //% group="LCD 16x2 Display"
+    //% group="calliope-net.github.io/lcd-16x2"
     //% block="i2c %pADDR Display löschen" weight=2
     //% pADDR.shadow="lcd16x2_eADDR"
     export function clearScreen(pADDR: number) {

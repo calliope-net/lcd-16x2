@@ -2,7 +2,7 @@
 namespace lcd16x2rgb
 /*
 */ {
-    export enum eADDR_RGB { RGB_16x2_V5 = 0x30, RGB_16x2_x62 = 0x62 }
+    export enum eADDR_RGB { RGB_16x2_x30 = 0x30, RGB_16x2_V5 = 0x30, RGB_16x2_x62 = 0x62 }
     let n_i2cCheck: boolean = false // i2c-Check
     let n_i2cError: number = 0 // Fehlercode vom letzten WriteBuffer (0 ist kein Fehler)
 
