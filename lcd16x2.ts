@@ -169,6 +169,13 @@ Code anhand der original Datenblätter neu programmiert von Lutz Elßner im Juli
         }
      */
 
+    // ========== group="Kommentar" advanced=true
+
+    //% group="Kommentar" advanced=true
+    //% block="// %text"
+    export function comment(text: string): void { }
+
+
     // ========== group="Text, Logik" advanced=true
 
     //% group="Text, Logik" advanced=true
